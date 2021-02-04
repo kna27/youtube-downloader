@@ -13,34 +13,33 @@ class Application(Frame):
         self.path_ent.insert(0, str(dir)) 
         print(self.path_ent.get())
 
-    def downloadProgress(self, stream = None, chunk = None, file_handle = None, remaining = None):
-        return (100*(file_size-remaining))/file_size
-
     def downloadVid(self):
-        self.submitButton['text'] = "Downloading, be patient"
+        self.pickList[self.chosenRes].download(self.path_ent.get())  # Path where to store the video
+        self.submitButton['text'] = "Download a new video"
+    def chooseResVid(self):
+        self.chosenRes = 0
         video_url = str(self.url.get())
         youtube = YouTube(video_url)
-        #vidOptions = []
-        video = youtube.streams.first()
-        # column = 4
-        # for i in video:
-        #     vidOptions += (str(i.resolution))            
-        #     Radiobutton(self,
-        #                 text = i,
-        #                 variable = self.options,
-        #                 value = i
-        #                 ).grid(row = 7, column = column, sticky = W)
-        #     column += 1
+        vidOptions = youtube.streams.filter(progressive=True, type='video', subtype='mp4').all()
 
-        videos = youtube.get_videos()
-        for option in videos:
-            print (option)
+        resOptions = []
+        self.pickList = []
+        for x in vidOptions:
+            if x.resolution not in resOptions:
+                resOptions.append(x.resolution)
+                self.pickList.append(x)
 
-        global file_size
-        file_size = video.filesize
-        video.download(self.path_ent.get())  # Path where to store the video
-        self.submitButton['text'] = "Download a new video"
-
+        row = 4
+        for i in self.pickList:       
+            Radiobutton(self,
+                        text = i.resolution,
+                        variable = self.chosenRes,
+                        value = i
+                        ).grid(row = row, column = 0, sticky = W)
+            row += 1
+        
+        self.submitButton = Button(self, text = "Next", command = self.downloadVid)
+        self.submitButton.grid(row = row, column = 0, sticky=W)
     def __init__(self, master):
         super(Application, self).__init__(master)
         self.grid()
@@ -59,8 +58,8 @@ class Application(Frame):
         self.path_ent.grid(row = 2, column = 1, sticky = W)
         
         Button(self, text="Browse", command = self.browse).grid(row = 2, column = 2)
-        self.submitButton = Button(self, text = "Submit", command = self.downloadVid)
-        self.submitButton.grid(row = 3, column = 0, sticky=W)
+        self.vidButton = Button(self, text = "Download video", command = self.chooseResVid)
+        self.vidButton.grid(row = 3, column = 0, sticky=W)
 
 root = Tk()
 root.title("YouTube Downloader")
