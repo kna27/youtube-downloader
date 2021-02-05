@@ -4,8 +4,16 @@
 from pytube import YouTube
 from tkinter import filedialog
 from tkinter import *
+from PIL import Image, ImageTk
 
 class Application(Frame):
+
+
+    def __init__(self, master):
+        super(Application, self).__init__(master)
+        self.grid()
+        self.create_widgets()
+        self.reslist = []
 
     def browse(self):
         dir = filedialog.askdirectory()
@@ -16,7 +24,11 @@ class Application(Frame):
     def downloadVid(self):
         self.pickList[self.chosenRes].download(self.path_ent.get())  # Path where to store the video
         self.submitButton['text'] = "Download a new video"
+
     def chooseResVid(self):
+        for b in self.reslist:
+            b.destroy()
+
         self.chosenRes = 0
         video_url = str(self.url.get())
         youtube = YouTube(video_url)
@@ -31,19 +43,60 @@ class Application(Frame):
 
         row = 4
         for i in self.pickList:       
-            Radiobutton(self,
-                        text = i.resolution,
-                        variable = self.chosenRes,
-                        value = i
-                        ).grid(row = row, column = 0, sticky = W)
+            a = Radiobutton(self, text = i.resolution, variable = self.chosenRes, value = i)
+            a.grid(row = row, column = 0, sticky = W)
+            self.reslist.append(a)
             row += 1
-        
+            
         self.submitButton = Button(self, text = "Next", command = self.downloadVid)
         self.submitButton.grid(row = row, column = 0, sticky=W)
-    def __init__(self, master):
-        super(Application, self).__init__(master)
-        self.grid()
-        self.create_widgets()
+        self.reslist.append(self.submitButton)
+    def chooseResAudio(self):
+        for b in self.reslist:
+            b.destroy()
+
+        self.chosenRes = 0
+        video_url = str(self.url.get())
+        youtube = YouTube(video_url)
+        audOptions = youtube.streams.filter(type='audio').all()
+
+        resOptions = []
+        self.pickList = []
+        for x in audOptions:
+            if x.abr not in resOptions:
+                resOptions.append(x.abr)
+                self.pickList.append(x)
+
+        row = 4
+        for i in self.pickList:       
+            a = Radiobutton(self, text = i.abr, variable = self.chosenRes, value = i)
+            a.grid(row = row, column = 0, sticky = W)
+            self.reslist.append(a)
+            row += 1
+        
+        self.submitButton = Button(self, text = "Next", command = lambda:[self.downloadVid, self.vidDetails])
+        self.submitButton.grid(row = row, column = 0, sticky=W)
+        self.reslist.append(self.submitButton)
+        
+    def vidDetails(self):
+        video_url = str(self.url.get())
+        youtube = YouTube(video_url)
+
+        print(youtube.thumbnail_url, youtube.title)
+
+        image = PhotoImage(file=youtube.thumbnail_url)
+        l= Label(self, image = image)
+        l.grid(row=0,column=0)
+        l.photo = image
+
+        Label(self, text = youtube.title, justify="center", width=20).grid(row = 3, column = 4, columnspan = 2, sticky=W)
+        return youtube.thumbnail_url, youtube.title
+
+    def runVidFunc(self):
+        self.vidDetails()
+        self.chooseResVid()
+
+        
         
     def create_widgets(self):
         Label(self, text = "YouTube Downloader", justify="center", font=("Helvetica", 20, "bold")).grid(row = 0, column = 0, columnspan = 2)
@@ -58,8 +111,10 @@ class Application(Frame):
         self.path_ent.grid(row = 2, column = 1, sticky = W)
         
         Button(self, text="Browse", command = self.browse).grid(row = 2, column = 2)
-        self.vidButton = Button(self, text = "Download video", command = self.chooseResVid)
+        self.vidButton = Button(self, text = "Download video", command = self.runVidFunc)
         self.vidButton.grid(row = 3, column = 0, sticky=W)
+        self.audButton = Button(self, text = "Download audio", command = self.chooseResAudio)
+        self.audButton.grid(row = 3, column = 1, sticky=W)
 
 root = Tk()
 root.title("YouTube Downloader")
