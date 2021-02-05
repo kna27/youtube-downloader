@@ -1,6 +1,6 @@
 # youtube-downloader
 YouTube downloader made in Python, tkinter, and pyTube.
-
+Made for Intro to Comp Sci midyear project.
 Made by:
 
-Krish Arora
+Krish Arora, Vansh Zota
