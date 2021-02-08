@@ -5,7 +5,7 @@ from pytube import YouTube
 from tkinter import filedialog
 from tkinter import *
 from PIL import Image, ImageTk
-
+import urllib.request
 class Application(Frame):
 
 
@@ -81,16 +81,13 @@ class Application(Frame):
     def vidDetails(self):
         video_url = str(self.url.get())
         youtube = YouTube(video_url)
+        urllib.request.urlretrieve(youtube.thumbnail_url, "thumb.png")
+        img = ImageTk.PhotoImage(Image.open("thumb.png").resize((160, 90)))
+        Label(self, text = youtube.title).grid(row = 1, column = 4, sticky=W)
 
-        print(youtube.thumbnail_url, youtube.title)
-
-        image = PhotoImage(file=youtube.thumbnail_url)
-        l= Label(self, image = image)
-        l.grid(row=0,column=0)
-        l.photo = image
-
-        Label(self, text = youtube.title, justify="center", width=20).grid(row = 3, column = 4, columnspan = 2, sticky=W)
-        return youtube.thumbnail_url, youtube.title
+        l= Label(self, image = img)
+        l.grid(row=0,column=4)
+        l.photo = img
 
     def runVidFunc(self):
         self.vidDetails()
