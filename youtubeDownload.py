@@ -78,24 +78,39 @@ class Application(Frame):
         
     def vidDetails(self):
         #Finds the video's title and thumbnail
-        video_url = str(self.url.get())
-        self.youtube = YouTube(video_url)
-        urllib.request.urlretrieve(self.youtube.thumbnail_url, "thumb.png")
-        img = ImageTk.PhotoImage(Image.open("thumb.png").resize((160, 90)))
-        Label(self, text = self.youtube.title,font=("Garamond", 14)).grid(row = 1, column = 4, sticky=W)
-        l= Label(self, image = img)
-        l.grid(row=0,column=4)
-        l.photo = img
+        try:
+            video_url = str(self.url.get())
+            self.youtube = YouTube(video_url)
+            urllib.request.urlretrieve(self.youtube.thumbnail_url, "thumb.png")
+            img = ImageTk.PhotoImage(Image.open("thumb.png").resize((160, 90)))
+            Label(self, text = self.youtube.title,font=("Garamond", 14)).grid(row = 1, column = 4, sticky=W)
+            l= Label(self, image = img)
+            l.grid(row=0,column=4)
+            l.photo = img
+        except:
+            a = Label(self, text = "Please insert a valid URL!", font=("Garamond", 15, "bold"), fg="red")
+            a.grid(row = 4, column = 0, sticky = W)
+            self.reslist.append(a)
 
     def runVidFunc(self):
         #Runs vidDetails() and chooseResVid()
-        self.vidDetails()
-        self.chooseResVid()
+        try:
+            self.vidDetails()
+            self.chooseResVid()
+        except:
+            a = Label(self, text = "Please insert a valid URL!", font=("Garamond", 15, "bold"), fg="red")
+            a.grid(row = 4, column = 0, sticky = W)
+            self.reslist.append(a)
 
     def runAudFunc(self):
         #Runs vidDetails() and chooseResAudio()
-        self.vidDetails()
-        self.chooseResAudio()
+        try:
+            self.vidDetails()
+            self.chooseResAudio()
+        except:
+            a = Label(self, text = "Please insert a valid URL!", font=("Garamond", 15, "bold"), fg="red")
+            a.grid(row = 4, column = 0, sticky = W)
+            self.reslist.append(a)
         
     def create_widgets(self):
         #Creates the starting widgets
