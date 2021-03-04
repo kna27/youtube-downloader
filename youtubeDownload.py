@@ -17,6 +17,7 @@ class Application(Frame):
         self.grid()
         self.create_widgets()
         self.reslist = []
+        self.elemlist = []
     
     def browse(self):
         # Create brose menu to store file
@@ -79,14 +80,21 @@ class Application(Frame):
     def vidDetails(self):
         #Finds the video's title and thumbnail
         try:
+            for x in self.elemlist:
+                x.destroy()
+
             video_url = str(self.url.get())
             self.youtube = YouTube(video_url)
             urllib.request.urlretrieve(self.youtube.thumbnail_url, "thumb.png")
             img = ImageTk.PhotoImage(Image.open("thumb.png").resize((160, 90)))
-            Label(self, text = self.youtube.title,font=("Garamond", 14)).grid(row = 1, column = 4, sticky=W)
+            title = Label(self, text = self.youtube.title,font=("Garamond", 14))
+            title.grid(row = 1, column = 4, sticky=W)
             l= Label(self, image = img)
             l.grid(row=0,column=4)
             l.photo = img
+
+            self.elemlist.append(title)
+            self.elemlist.append(l)
         except:
             a = Label(self, text = "Please insert a valid URL!", font=("Garamond", 15, "bold"), fg="red")
             a.grid(row = 4, column = 0, sticky = W)
